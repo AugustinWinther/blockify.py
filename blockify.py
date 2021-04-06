@@ -5,14 +5,14 @@ from PIL import Image
 if len(arguments) < 5:
     print("Too few arguments!\n"
           "Script usage: python blockify.py " 
-          "<input image> <width> <height> <index file>")
+          "<input image> <width> <height> <texture list>")
     quit()
 
 # Define passed arguments
 input_image = arguments[1]
 block_width = int(arguments[2])
 block_height = int(arguments[3])
-index_file = arguments[4]
+texture_list = arguments[4]
 keep_ratio = "no"
 
 # Check passed arguments for errors
@@ -48,13 +48,13 @@ elif (keep_ratio == "no"):
                 "Please use a block width between 16 and 512")
         quit()
 
-# 2D list containing contents from index_file.
+# 2D list containing contents from texture_list.
 # Item example: ['path/texture.png', (255, 255, 255)]
 index_list = []
 
-# Adds lines from index_file to index_list.
+# Adds lines from texture_list to index_list.
 # Line example: path/texture.png 255 255 255
-with open(index_file) as file:
+with open(texture_list) as file:
     for line in file: 
         text = line.split(" ")
         texture = text[0]
