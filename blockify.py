@@ -100,7 +100,7 @@ def replace_pixels(pixel_x, pixel_y, length):
     for i in range(length):
         with Image.open(texture_file) as texture:
             final_image.paste(texture,((pixel_x*16),((pixel_y+i)*16)))
-    
+ 
 # Set "pixel" to be equal to the pixel information from image
 pixel = image.load()
 
@@ -111,6 +111,14 @@ max_x, max_y = (image_width - 1), (image_height - 1)
 pixel_repeat = 1
 
 while pixel_x <= max_x:
+   
+    # Prints progress bar
+    percent = round((pixel_x / max_x) * 100)
+    percent_left = 100 - percent
+    progress_bar = (round(percent / 2) * '█' ) + (round(percent_left / 2) * '-')
+    print(" Progress:", progress_bar, percent, "%", end="\r")
+
+
     this_pixel = pixel[pixel_x, pixel_y]
     start_pixel = pixel[start_pixel_x, start_pixel_y]
 
