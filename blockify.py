@@ -13,6 +13,7 @@ input_image = arguments[1]
 block_width = int(arguments[2])
 block_height = int(arguments[3])
 index_file = arguments[4]
+keep_ratio = "no"
 
 # Check passed arguments for errors
 if ((input_image.endswith(".png") == False) and 
@@ -22,14 +23,30 @@ if ((input_image.endswith(".png") == False) and
     print("Input picture not supported!\n"
           "Please use PNG, BMP, JPG or JPEG")
     quit()
-elif ((block_width > 512) or (block_width < 16)):
-    print("Block width invalid!\n"
-          "Please use a block width between 16 and 512")
+elif ((block_width == 0) and (block_height == 0)):
+    print("Height and width can't both be 0!\n")
     quit()
-elif ((block_height > 512) or (block_height < 16)):
-    print("Block height invalid!\n"
-          "Please use a block height between 16 and 512")
-    quit()
+elif (block_width == 0):
+    if ((block_height > 512) or (block_height < 16)):
+        print("Block height invalid!\n"
+              "Please use a block height between 16 and 512")
+        quit()
+    keep_ratio = "width"
+elif (block_height == 0):
+    if ((block_width > 512) or (block_width < 16)):
+        print("Block width invalid!\n"
+              "Please use a block width between 16 and 512")
+        quit()
+    keep_ratio = "height"
+elif (keep_ratio == "no"):
+    if ((block_width > 512) or (block_width < 16)):
+        print("Block width invalid!\n"
+                "Please use a block width between 16 and 512")
+        quit()
+    elif ((block_height > 512) or (block_height < 16)):
+        print("Block width invalid!\n"
+                "Please use a block width between 16 and 512")
+        quit()
 
 # 2D list containing contents from index_file.
 # Item example: ['path/texture.png', (255, 255, 255)]
@@ -46,6 +63,10 @@ with open(index_file) as file:
 
 # Resizes input_image to pixel_art_res
 with Image.open(input_image) as image:
+    if (keep_ratio == "width"):
+        block_width = round(image.size[0] * (block_height / image.size[1]))
+    elif (keep_ratio == "height"):
+        block_height = round(image.size[1] * (block_width / image.size[0]))
     image = image.resize((block_width, block_height))
     image_width, image_height = (image.size[0]), (image.size[1])
 
