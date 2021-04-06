@@ -4,7 +4,7 @@ from PIL import Image
 # Check if enough arguments are passed
 if len(arguments) < 5:
     print("Too few arguments!\n"
-          "Script usage: python pic2mc.py " 
+          "Script usage: python blockify.py " 
           "<input image> <width> <height> <index file>")
     quit()
 
@@ -32,11 +32,11 @@ elif ((block_height > 512) or (block_height < 16)):
     quit()
 
 # 2D list containing contents from index_file.
-# Item exmpl: ['path/texure.png', (255, 255, 255)]
+# Item example: ['path/texture.png', (255, 255, 255)]
 index_list = []
 
 # Adds lines from index_file to index_list.
-# Line exmpl: path/texure.png 255 255 255
+# Line example: path/texture.png 255 255 255
 with open(index_file) as file:
     for line in file: 
         text = line.split(" ")
@@ -51,7 +51,7 @@ with Image.open(input_image) as image:
 
 # Create an empty image which will be used as final output image.  
 # This image will be a mosaic of textures from index_list.  
-# Multiplicating width & height by 16px (texture resolution).  
+# Times width and height by 16px (texture resolution).  
 final_image = Image.new('RGB', ((image_width*16), (image_height*16)))
 
 # Find best matching texture for pixel color
@@ -71,7 +71,7 @@ def pixel_to_texture(pixel_x, pixel_y):
     return texture
 
 # Replaces pixels based on start pixel coordinate(pixel_x, pixel_y).
-# and how many times that pixel repeats it self (length).
+# and how many times that pixel repeats itself (length).
 # NOTE: Replaces pixels from top to bottom (y-top to y-bottom)
 # NOTE: Times x and y with 16px (texture resolution)
 def replace_pixels(pixel_x, pixel_y, length):
