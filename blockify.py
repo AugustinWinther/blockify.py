@@ -2,17 +2,24 @@ from sys import argv as arguments
 from PIL import Image
 
 # Check if enough arguments are passed
-if len(arguments) < 5:
+if len(arguments) < 2:
     print("Too few arguments!\n"
           "Script usage: python blockify.py " 
-          "<input image> <width> <height> <texture list>")
+          "<input image> <width> <height> <texture list>\n"
+          "or just: "
+          "python blockify.py <input image>")
     quit()
-
-# Define passed arguments
-input_image = arguments[1]
-block_width = int(arguments[2])
-block_height = int(arguments[3])
-texture_list = arguments[4]
+elif len(arguments) == 2:
+    input_image = arguments[1]
+    block_width = 128
+    block_height = 0
+    texture_list = "./block.list/all.txt"
+elif len(arguments) > 4:
+    input_image = arguments[1]
+    block_width = int(arguments[2])
+    block_height = int(arguments[3])
+    texture_list = arguments[4]
+    
 keep_ratio = "no"
 
 # Check passed arguments for errors
