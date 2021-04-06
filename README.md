@@ -6,11 +6,11 @@ Picture to Minecraft pixel art generator written in python.
 - Pillow >= 8.2.0 - ``` pip install pillow ```
 
 ### How to use
-```python blockify.py <input image> <width> <height> <index file>``` 
+```python blockify.py <input image> <width> <height> <texture list>``` 
 - ```<input image>``` Picture you want to convert
 - ```<width>``` Amount of Minecraft blocks wide
 - ```<height>``` Amount of Minecraft blocks high
-- ```<index file>``` One of the files from ./block.list 
+- ```<index file>``` One of the texture lists from ./block.list 
 
 (To keep the ratio of input image, specify either width or height, and let the other one be 0.)
 
