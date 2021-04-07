@@ -10,7 +10,7 @@ Picture to Minecraft pixel art generator written in python.
 - ```<input image>``` Picture you want to convert
 - ```<width>``` Amount of Minecraft blocks wide
 - ```<height>``` Amount of Minecraft blocks high
-- ```<index file>``` One of the texture lists from ./block.list 
+- ```<texture list>``` One of the texture lists from ./block.list 
 
 (To keep the ratio of input image, specify either width or height, and let the other one be 0.)
 
