@@ -34,25 +34,25 @@ elif ((block_width == 0) and (block_height == 0)):
     print("Height and width can't both be 0!\n")
     quit()
 elif (block_width == 0):
-    if ((block_height > 512) or (block_height < 16)):
+    if (block_height < 2):
         print("Block height invalid!\n"
-              "Please use a block height between 16 and 512")
+              "Please use a block height greater than 1")
         quit()
     keep_ratio = "width"
 elif (block_height == 0):
-    if ((block_width > 512) or (block_width < 16)):
+    if (block_width < 2):
         print("Block width invalid!\n"
-              "Please use a block width between 16 and 512")
+              "Please use a block width greater than 1")
         quit()
     keep_ratio = "height"
 elif (keep_ratio == "no"):
-    if ((block_width > 512) or (block_width < 16)):
+    if (block_width < 2):
         print("Block width invalid!\n"
-                "Please use a block width between 16 and 512")
+                "Please use a block width greater than 1")
         quit()
-    elif ((block_height > 512) or (block_height < 16)):
-        print("Block width invalid!\n"
-                "Please use a block width between 16 and 512")
+    elif (block_height < 2):
+        print("Block height invalid!\n"
+                "Please use a block height greater than 1")
         quit()
 
 # 2D list containing contents from texture_list.
