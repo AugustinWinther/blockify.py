@@ -202,8 +202,8 @@ while pixel_x <= max_x:
             pixel_repeat = 1
 
 time_passed = (time.time() - start_time)
-sec_passed =  time_passed % 60
-min_passed = sec_passed / 60
+sec_passed = time_passed % 60
+min_passed = time_passed / 60
 print("\n Finished in: %dm %ds" % (min_passed, sec_passed))
 
 # Output filename is input image name + "-mc.png".
