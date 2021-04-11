@@ -1,4 +1,5 @@
 from sys import argv as arguments
+from os import path
 from PIL import Image
 
 # Check if enough arguments are passed
@@ -16,21 +17,34 @@ elif len(arguments) == 2:
     texture_list = "./block.list/all.txt"
 elif len(arguments) > 4:
     input_image = arguments[1]
-    block_width = int(arguments[2])
-    block_height = int(arguments[3])
+    block_width = arguments[2]
+    block_height = arguments[3]
     texture_list = arguments[4]
     
 keep_ratio = "no"
 
-# Check passed arguments for errors
-if ((input_image.endswith(".png") == False) and 
-    (input_image.endswith(".jpg") == False) and 
-    (input_image.endswith(".bmp") == False) and
-    (input_image.endswith(".jpeg") == False)):
-    print("Input picture not supported!\n"
-          "Please use PNG, BMP, JPG or JPEG")
+# Check input_image for errors
+if (path.exists(input_image) == True):
+    if ((input_image.endswith(".png") == False) and 
+        (input_image.endswith(".jpg") == False) and 
+        (input_image.endswith(".bmp") == False) and
+        (input_image.endswith(".jpeg") == False)):
+        print("Input picture not supported!\n"
+            "Please use PNG, BMP, JPG or JPEG")
+        quit()
+else:
+    print("Image '",input_image,"' does not exitst!")
     quit()
-elif ((block_width == 0) and (block_height == 0)):
+
+# Check block_width and block_height for errors
+try:
+    block_width = int(block_width)
+    block_height = int(block_height)
+except:
+    print("Width and height needs to be integers!")
+    quit()
+
+if ((block_width == 0) and (block_height == 0)):
     print("Height and width can't both be 0!\n")
     quit()
 elif (block_width == 0):
@@ -54,6 +68,11 @@ elif (keep_ratio == "no"):
         print("Block height invalid!\n"
                 "Please use a block height greater than 1")
         quit()
+
+# Check texture_list for errors
+if (path.exists(texture_list) == False):
+    print("Texture list '",texture_list,"' does not exitst!")
+    quit()
 
 # 2D list containing contents from texture_list.
 # Item example: ['path/texture.png', (255, 255, 255)]
