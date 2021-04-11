@@ -1,5 +1,6 @@
 from sys import argv as arguments
 from os import path
+import time
 from PIL import Image
 
 # Check if enough arguments are passed
@@ -134,17 +135,36 @@ pixel = image.load()
 pixel_x = pixel_y = 0
 start_pixel_x = start_pixel_y = 0
 max_x, max_y = (image_width - 1), (image_height - 1)
+pixel_count = max_x * max_y
 pixel_repeat = 1
 
+start_time = time.time()  # Time at pixel to minecraft texture start
+last_pixel_time = time.time()
+this_pixel_time = 0
+last_pixel_count = 0
+last_eta_print_time = 0
+
 while pixel_x <= max_x:
+    
+    # If 100 pixeles have been converted
+    this_pixel_count = ((pixel_x+1)*max_y)+pixel_y+1
+    if ((this_pixel_count - last_pixel_count) >= 100):
+        last_pixel_count = this_pixel_count
+        this_pixel_time = time.time() - last_pixel_time
+        last_pixel_time = time.time() 
    
-    # Prints progress bar
+    # Prints progress bar and ETA
     percent = round((pixel_x / max_x) * 100)
     percent_left = 100 - percent
     progress_bar = (round(percent / 2) * '█' ) + (round(percent_left / 2) * '-')
-    print(" Progress:", progress_bar, percent, "%", end="\r")
-
-
+    if ((time.time() - last_eta_print_time) >= 2):
+        eta = this_pixel_time*((pixel_count - this_pixel_count)/100)
+        eta_sec = eta % 60
+        eta_min = eta / 60
+        last_eta_print_time = time.time()
+    print(" Progress:", progress_bar, percent, "%", 
+        " ETA: %dm %ds " %(eta_min, eta_sec), end="\r")
+    
     this_pixel = pixel[pixel_x, pixel_y]
     start_pixel = pixel[start_pixel_x, start_pixel_y]
 
@@ -180,6 +200,11 @@ while pixel_x <= max_x:
             pixel_x += 1
             start_pixel_x, start_pixel_y = pixel_x, pixel_y
             pixel_repeat = 1
+
+time_passed = (time.time() - start_time)
+sec_passed =  time_passed % 60
+min_passed = sec_passed / 60
+print("\n Finished in: %dm %ds" % (min_passed, sec_passed))
 
 # Output filename is input image name + "-mc.png".
 # (Input = file.jpg   =>   Output = file-mc.png)
