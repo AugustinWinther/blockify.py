@@ -147,6 +147,8 @@ this_pixel_time = 0
 last_pixel_count = 0
 last_eta_print_time = 0
 
+print("\n Converting %s" % input_image)
+
 while pixel_x <= max_x:
     
     # If 100 pixeles have been converted
@@ -211,4 +213,6 @@ print("\n Finished in: %dm %ds" % (min_passed, sec_passed))
 
 # Output filename is input image name + "-mc.png".
 # (Input = file.jpg   =>   Output = file-mc.png)
-final_image.save((input_image.split("."))[0] + "-mc.png")
+output_name = (input_image.split("."))[0] + "-mc.png"
+print(" Saving to %s" % output_name)
+final_image.save(output_name)
