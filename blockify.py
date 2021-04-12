@@ -3,6 +3,12 @@ from os import path
 import time
 from PIL import Image
 
+
+# Set default values
+block_width = 128
+block_height = 0
+texture_list = "./block.list/ideal.txt"
+
 # Check if enough arguments are passed
 if len(arguments) < 2:
     print("Too few arguments!\n"
@@ -13,15 +19,20 @@ if len(arguments) < 2:
     quit()
 elif len(arguments) == 2:
     input_image = arguments[1]
-    block_width = 128
+elif len(arguments) == 3:
+    input_image = arguments[1]
+    block_width = arguments[2]
     block_height = 0
-    texture_list = "./block.list/all.txt"
+elif len(arguments) == 4:
+    input_image = arguments[1]
+    block_width = arguments[2]
+    block_height = arguments[3]
 elif len(arguments) > 4:
     input_image = arguments[1]
     block_width = arguments[2]
     block_height = arguments[3]
     texture_list = arguments[4]
-    
+
 keep_ratio = "no"
 
 # Check input_image for errors
