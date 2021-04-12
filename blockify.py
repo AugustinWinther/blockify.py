@@ -33,8 +33,6 @@ elif len(arguments) > 4:
     block_height = arguments[3]
     texture_list = arguments[4]
 
-keep_ratio = "no"
-
 # Check input_image for errors
 if (path.exists(input_image) == True):
     if ((input_image.endswith(".png") == False) and 
@@ -64,21 +62,15 @@ elif (block_width == 0):
         print("Block height invalid!\n"
               "Please use a block height greater than 1")
         quit()
-    keep_ratio = "width"
 elif (block_height == 0):
     if (block_width < 2):
         print("Block width invalid!\n"
               "Please use a block width greater than 1")
         quit()
-    keep_ratio = "height"
-elif (keep_ratio == "no"):
-    if (block_width < 2):
-        print("Block width invalid!\n"
-                "Please use a block width greater than 1")
-        quit()
-    elif (block_height < 2):
-        print("Block height invalid!\n"
-                "Please use a block height greater than 1")
+elif ((block_width != 0) and (block_height != 0)):
+    if ((block_width < 2) or (block_height < 2)):
+        print("Block height or width invalid!\n"
+              "Please use size greater than 1")
         quit()
 
 # Check texture_list for errors
@@ -101,9 +93,9 @@ with open(texture_list) as file:
 
 # Resizes input_image to pixel_art_res
 with Image.open(input_image) as image:
-    if (keep_ratio == "width"):
+    if (block_width == 0):
         block_width = round(image.size[0] * (block_height / image.size[1]))
-    elif (keep_ratio == "height"):
+    elif (block_height == 0):
         block_height = round(image.size[1] * (block_width / image.size[0]))
     image = image.resize((block_width, block_height))
     image_width, image_height = (image.size[0]), (image.size[1])
