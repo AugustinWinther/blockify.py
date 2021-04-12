@@ -22,7 +22,6 @@ elif len(arguments) == 2:
 elif len(arguments) == 3:
     input_image = arguments[1]
     block_width = arguments[2]
-    block_height = 0
 elif len(arguments) == 4:
     input_image = arguments[1]
     block_width = arguments[2]
@@ -43,7 +42,7 @@ if (path.exists(input_image) == True):
             "Please use PNG, BMP, JPG or JPEG")
         quit()
 else:
-    print("Image '",input_image,"' does not exitst!")
+    print("Image '%s' does not exist!" % input_image)
     quit()
 
 # Check block_width and block_height for errors
@@ -75,7 +74,7 @@ elif ((block_width != 0) and (block_height != 0)):
 
 # Check texture_list for errors
 if (path.exists(texture_list) == False):
-    print("Texture list '",texture_list,"' does not exitst!")
+    print("Texture list '%s' does not exist!" % texture_list)
     quit()
 
 # 2D list containing contents from texture_list.
@@ -168,7 +167,7 @@ while pixel_x <= max_x:
         eta_min = eta / 60
         last_eta_print_time = time.time()
     print(" Progress:", progress_bar, percent, "%", 
-        " ETA: %dm %ds " %(eta_min, eta_sec), end="\r")
+          " ETA: %dm %ds " %(eta_min, eta_sec), end="\r")
     
     this_pixel = pixel[pixel_x, pixel_y]
     start_pixel = pixel[start_pixel_x, start_pixel_y]
@@ -211,8 +210,6 @@ sec_passed = time_passed % 60
 min_passed = time_passed / 60
 print("\n Finished in: %dm %ds" % (min_passed, sec_passed))
 
-# Output filename is input image name + "-mc.png".
-# (Input = file.jpg   =>   Output = file-mc.png)
 output_name = (input_image.split("."))[0] + "-mc.png"
 print(" Saving to %s" % output_name)
 final_image.save(output_name)
