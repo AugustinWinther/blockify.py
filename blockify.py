@@ -93,9 +93,12 @@ with open(texture_list) as file:
 # Resizes input_image to pixel_art_res
 with Image.open(input_image) as image:
     if (block_width == 0):
-        block_width = round(image.size[0] * (block_height / image.size[1]))
+        block_width = round(image.size[0] 
+                            * (block_height / image.size[1]))
     elif (block_height == 0):
-        block_height = round(image.size[1] * (block_width / image.size[0]))
+        block_height = round(image.size[1] 
+                             * (block_width / image.size[0]))
+    
     image = image.resize((block_width, block_height))
     image_width, image_height = (image.size[0]), (image.size[1])
 
@@ -133,41 +136,47 @@ def replace_pixels(pixel_x, pixel_y, length):
 # Set "pixel" to be equal to the pixel information from image
 pixel = image.load()
 
-# Go through every pixel in image, and replace pixels with textures
+# Define default values to be used in converting algorithm
 pixel_x = pixel_y = 0
 start_pixel_x = start_pixel_y = 0
 max_x, max_y = (image_width - 1), (image_height - 1)
 pixel_count = max_x * max_y
 pixel_repeat = 1
-
-start_time = time.time()  # Time at pixel to minecraft texture start
-last_pixel_time = time.time()
-this_pixel_time = 0
-last_pixel_count = 0
-last_eta_print_time = 0
+pixel_conv = 0  # Amount of pixels converted
+pixel_conv_time = 0
+time_since_last_conv = time.time()
+eta_string = ""
+last_eta_print = time.time()
+last_eta = 0
+last_percent = -1
 
 print("\n Converting %s" % input_image)
+start_time = time.time()
 
+# START OF CONVERTING
 while pixel_x <= max_x:
     
-    # If 100 pixeles have been converted
-    this_pixel_count = ((pixel_x+1)*max_y)+pixel_y+1
-    if ((this_pixel_count - last_pixel_count) >= 100):
-        last_pixel_count = this_pixel_count
-        this_pixel_time = time.time() - last_pixel_time
-        last_pixel_time = time.time() 
+    # Calculate time used to convert 100 pixels
+    if (pixel_conv % 100 == 0):
+        pixel_conv_time = time.time() - time_since_last_conv
+        time_since_last_conv = time.time() 
    
-    # Prints progress bar and ETA
-    percent = round((pixel_x / max_x) * 100)
-    percent_left = 100 - percent
-    progress_bar = (round(percent / 2) * '█' ) + (round(percent_left / 2) * '-')
-    if ((time.time() - last_eta_print_time) >= 2):
-        eta = this_pixel_time*((pixel_count - this_pixel_count)/100)
+    # Create and print progress bar and ETA
+    if (time.time() - last_eta_print >= 2):
+        eta = pixel_conv_time*((pixel_count - pixel_conv)/100)
         eta_sec = eta % 60
         eta_min = eta / 60
-        last_eta_print_time = time.time()
-    print(" Progress:", progress_bar, percent, "%", 
-          " ETA: %dm %ds " %(eta_min, eta_sec), end="\r")
+        eta_string = " ETA: %dm %ds "  % (eta_min, eta_sec)
+        last_eta_print = time.time()
+    percent = round((pixel_x / max_x) * 100)
+    if (percent > last_percent):
+        last_percent = percent
+        percent_left = 100 - percent
+        progress_bar = (round(percent / 2) * '█' ) \
+                     + (round(percent_left / 2) * '-')
+        print(" Progress:", progress_bar, percent, "%", 
+            eta_string , end="\r")
+
     
     this_pixel = pixel[pixel_x, pixel_y]
     start_pixel = pixel[start_pixel_x, start_pixel_y]
@@ -204,12 +213,17 @@ while pixel_x <= max_x:
             pixel_x += 1
             start_pixel_x, start_pixel_y = pixel_x, pixel_y
             pixel_repeat = 1
+    pixel_conv += 1
+# END OF CONVERTING
 
+# Caluclate and print time passed
 time_passed = (time.time() - start_time)
 sec_passed = time_passed % 60
 min_passed = time_passed / 60
 print("\n Finished in: %dm %ds" % (min_passed, sec_passed))
 
+
+# Save converted image
 output_name = (input_image.split("."))[0] + "-mc.png"
 print(" Saving to %s" % output_name)
 final_image.save(output_name)
