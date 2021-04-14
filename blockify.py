@@ -17,20 +17,14 @@ if len(arguments) < 2:
           "or just: "
           "python blockify.py <input image>")
     quit()
-elif len(arguments) == 2:
+elif len(arguments) > 1:
     input_image = arguments[1]
-elif len(arguments) == 3:
-    input_image = arguments[1]
-    block_width = arguments[2]
-elif len(arguments) == 4:
-    input_image = arguments[1]
-    block_width = arguments[2]
-    block_height = arguments[3]
-elif len(arguments) > 4:
-    input_image = arguments[1]
-    block_width = arguments[2]
-    block_height = arguments[3]
-    texture_list = arguments[4]
+    if len(arguments) > 2:
+        block_width = arguments[2]
+        if len(arguments) > 3:
+            block_height = arguments[3]
+            if len(arguments) > 4:
+                texture_list = arguments[4]
 
 # Check input_image for errors
 if (path.exists(input_image) == True):
@@ -115,9 +109,9 @@ def pixel_to_texture(pixel_x, pixel_y):
 
     for index in index_list: 
         color_rgb = index[1]
-        rgb_diff = (abs(pixel_rgb[0] - color_rgb[0]) + 
-                    abs(pixel_rgb[1] - color_rgb[1]) + 
-                    abs(pixel_rgb[2] - color_rgb[2]))
+        rgb_diff = (abs(pixel_rgb[0] - color_rgb[0])
+                    + abs(pixel_rgb[1] - color_rgb[1])
+                    + abs(pixel_rgb[2] - color_rgb[2]))
         if rgb_diff < min_rgb_diff:
             min_rgb_diff = rgb_diff
             texture = index[0]
@@ -172,24 +166,27 @@ while pixel_x <= max_x:
     if (percent > last_percent):
         last_percent = percent
         percent_left = 100 - percent
-        progress_bar = (round(percent / 2) * '█' ) \
-                     + (round(percent_left / 2) * '-')
+        progress_bar = ((round(percent / 2) * '█' ) 
+                       + (round(percent_left / 2) * '-'))
         print(" Progress:", progress_bar, percent, "%", 
             eta_string , end="\r")
 
-    
+
     this_pixel = pixel[pixel_x, pixel_y]
     start_pixel = pixel[start_pixel_x, start_pixel_y]
 
+    # If pixel is last in column
     if (pixel_y == max_y):
         next_pixel = this_pixel
     else:
         next_pixel = pixel[pixel_x, pixel_y + 1]
 
-    rgb_diff = (abs(start_pixel[0] - next_pixel[0]) + 
-                abs(start_pixel[1] - next_pixel[1]) + 
-                abs(start_pixel[2] - next_pixel[2]))
+    # Get color difference
+    rgb_diff = (abs(start_pixel[0] - next_pixel[0])
+                + abs(start_pixel[1] - next_pixel[1])
+                + abs(start_pixel[2] - next_pixel[2]))
 
+    # Convert pixels
     if (pixel_y < max_y):
         if (rgb_diff > 6):
             replace_pixels(start_pixel_x, start_pixel_y, pixel_repeat)
@@ -202,17 +199,13 @@ while pixel_x <= max_x:
     else:
         if (rgb_diff > 6):
             replace_pixels(start_pixel_x, start_pixel_y, pixel_repeat)
-            pixel_y = 0
-            pixel_x += 1
-            start_pixel_x, start_pixel_y = pixel_x, pixel_y
-            pixel_repeat = 1
         else:
             pixel_repeat += 1
             replace_pixels(start_pixel_x, start_pixel_y, pixel_repeat)
-            pixel_y = 0
-            pixel_x += 1
-            start_pixel_x, start_pixel_y = pixel_x, pixel_y
-            pixel_repeat = 1
+        pixel_y = 0
+        pixel_x += 1
+        start_pixel_x, start_pixel_y = pixel_x, pixel_y
+        pixel_repeat = 1
     pixel_conv += 1
 # END OF CONVERTING
 
