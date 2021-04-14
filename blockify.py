@@ -1,113 +1,116 @@
-from sys import argv as arguments
+# STD lib imports
+from sys import argv as cli_args
 from os import path
 import time
+
+# 3D pary imports
 from PIL import Image
 
+def check_input():
+    # Set default values
+    width = 128
+    height = 0
+    texture_list = "./block.list/ideal.txt"
 
-# Set default values
-block_width = 128
-block_height = 0
-texture_list = "./block.list/ideal.txt"
-
-# Check if enough arguments are passed
-if len(arguments) < 2:
-    print("Too few arguments!\n"
-          "Script usage: python blockify.py " 
-          "<input image> <width> <height> <texture list>\n"
-          "or just: "
-          "python blockify.py <input image>")
-    quit()
-elif len(arguments) > 1:
-    input_image = arguments[1]
-    if len(arguments) > 2:
-        block_width = arguments[2]
-        if len(arguments) > 3:
-            block_height = arguments[3]
-            if len(arguments) > 4:
-                texture_list = arguments[4]
-
-# Check input_image for errors
-if (path.exists(input_image) == True):
-    if ((input_image.endswith(".png") == False) and 
-        (input_image.endswith(".jpg") == False) and 
-        (input_image.endswith(".bmp") == False) and
-        (input_image.endswith(".jpeg") == False)):
-        print("Input picture not supported!\n"
-            "Please use PNG, BMP, JPG or JPEG")
+    if len(cli_args) < 2:
+        print("Too few arguments!\n"
+            "Script usage: python blockify.py " 
+            "<input image> <width> <height> <texture list>\n"
+            "or just: "
+            "python blockify.py <input image>")
         quit()
-else:
-    print("Image '%s' does not exist!" % input_image)
-    quit()
+    elif len(cli_args) > 1:
+        image = cli_args[1]
+        if len(cli_args) > 2:
+            width = cli_args[2]
+            if len(cli_args) > 3:
+                height = cli_args[3]
+                if len(cli_args) > 4:
+                    texture_list = cli_args[4]
 
-# Check block_width and block_height for errors
-try:
-    block_width = int(block_width)
-    block_height = int(block_height)
-except:
-    print("Width and height needs to be integers!")
-    quit()
-
-if ((block_width == 0) and (block_height == 0)):
-    print("Height and width can't both be 0!\n")
-    quit()
-elif (block_width == 0):
-    if (block_height < 2):
-        print("Block height invalid!\n"
-              "Please use a block height greater than 1")
-        quit()
-elif (block_height == 0):
-    if (block_width < 2):
-        print("Block width invalid!\n"
-              "Please use a block width greater than 1")
-        quit()
-elif ((block_width != 0) and (block_height != 0)):
-    if ((block_width < 2) or (block_height < 2)):
-        print("Block height or width invalid!\n"
-              "Please use size greater than 1")
+    # Check input image for errors
+    if (path.exists(image) == True):
+        if ((image.endswith(".png") == False) and 
+            (image.endswith(".jpg") == False) and 
+            (image.endswith(".bmp") == False) and
+            (image.endswith(".jpeg") == False)):
+            print("Input picture not supported!\n"
+                "Please use PNG, BMP, JPG or JPEG")
+            quit()
+    else:
+        print("Image '%s' does not exist!" % image)
         quit()
 
-# Check texture_list for errors
-if (path.exists(texture_list) == False):
-    print("Texture list '%s' does not exist!" % texture_list)
-    quit()
+    # Check block width and block height for errors
+    try:
+        width = int(width)
+        height = int(height)
+    except:
+        print("Width and height needs to be integers!")
+        quit()
 
-# 2D list containing contents from texture_list.
-# Item example: ['path/texture.png', (255, 255, 255)]
-index_list = []
+    if ((width == 0) and (height == 0)):
+        print("Height and width can't both be 0!\n")
+        quit()
+    elif (width == 0):
+        if (height < 2):
+            print("Block height invalid!\n"
+                "Please use a block height greater than 1")
+            quit()
+    elif (height == 0):
+        if (width < 2):
+            print("Block width invalid!\n"
+                "Please use a block width greater than 1")
+            quit()
+    elif ((width != 0) and (height != 0)):
+        if ((width < 2) or (height < 2)):
+            print("Block height or width invalid!\n"
+                "Please use size greater than 1")
+            quit()
 
-# Adds lines from texture_list to index_list.
-# Line example: path/texture.png 255 255 255
-with open(texture_list) as file:
-    for line in file: 
-        text = line.split(" ")
-        texture = text[0]
-        color = (int(text[1]),int(text[2]),int(text[3]))  # (R,G,B)
-        index_list.append([texture, color])
+    # Check texture_list for errors
+    if (path.exists(texture_list) == False):
+        print("Texture list '%s' does not exist!" % texture_list)
+        quit()
 
-# Resizes input_image to pixel_art_res
-with Image.open(input_image) as image:
-    if (block_width == 0):
-        block_width = round(image.size[0] 
-                            * (block_height / image.size[1]))
-    elif (block_height == 0):
-        block_height = round(image.size[1] 
-                             * (block_width / image.size[0]))
+    check_input.image = image
+    check_input.width = width
+    check_input.height = height
+    check_input.texture_list = texture_list
+
+def file_to_list(list_file):
+    list = []
+
+    with open(list_file) as file:
+        for line in file: 
+            text = line.split(" ")
+            texture = text[0]
+            color = (int(text[1]),int(text[2]),int(text[3]))  # (R,G,B)
+            list.append([texture, color])
+    return list
+
+def resize_image(input_image, width, height):
+    with Image.open(input_image) as image:
+        if (width == 0):
+            width = round(image.size[0] * (height / image.size[1]))
+        elif (height == 0):
+            height = round(image.size[1] * (width / image.size[0]))
+        
+        resized_image = image.resize((width, height))
+        resized_width = (resized_image.size[0])
+        resized_height = (resized_image.size[1])
+
+    output_image = Image.new('RGB', ((resized_width*16), (resized_height*16)))
     
-    image = image.resize((block_width, block_height))
-    image_width, image_height = (image.size[0]), (image.size[1])
+    resize_image.output_image = output_image
+    resize_image.resized_image = resized_image
 
-# Create an empty image which will be used as final output image.  
-# This image will be a mosaic of textures from index_list.  
-# Times width and height by 16px (texture resolution).  
-final_image = Image.new('RGB', ((image_width*16), (image_height*16)))
-
-# Find best matching texture for pixel color
-def pixel_to_texture(pixel_x, pixel_y):
+def pixel_to_texture(pixel_info, pixel_x, pixel_y, list):
     min_rgb_diff = 1000
     texture = False
-    pixel_rgb = pixel[pixel_x, pixel_y]
+    pixel_rgb = pixel_info[pixel_x, pixel_y]
 
-    for index in index_list: 
+    for index in list: 
         color_rgb = index[1]
         rgb_diff = (abs(pixel_rgb[0] - color_rgb[0])
                     + abs(pixel_rgb[1] - color_rgb[1])
@@ -117,106 +120,134 @@ def pixel_to_texture(pixel_x, pixel_y):
             texture = index[0]
     return texture
 
-# Replaces pixels based on start pixel coordinate(pixel_x, pixel_y).
-# and how many times that pixel repeats itself (length).
-# NOTE: Replaces pixels from top to bottom (y-top to y-bottom)
-# NOTE: Times x and y with 16px (texture resolution)
-def replace_pixels(pixel_x, pixel_y, length):
-    texture_file = pixel_to_texture(pixel_x, pixel_y)
+def convert_pixels(pixel_info, pixel_x, pixel_y, length, list, output_image):
+    texture_file = pixel_to_texture(pixel_info, pixel_x, pixel_y, list)
     for i in range(length):
         with Image.open(texture_file) as texture:
-            final_image.paste(texture,((pixel_x*16),((pixel_y+i)*16)))
+            output_image.paste(texture,((pixel_x*16),((pixel_y+i)*16)))
  
-# Set "pixel" to be equal to the pixel information from image
-pixel = image.load()
+def convert_image(input_image, output_image, texture_list, input_image_name):
+    # Set "pixel" to be equal to the pixel information from image
+    pixel_info = input_image.load()
 
-# Define default values to be used in converting algorithm
-pixel_x = pixel_y = 0
-start_pixel_x = start_pixel_y = 0
-max_x, max_y = (image_width - 1), (image_height - 1)
-pixel_count = max_x * max_y
-pixel_repeat = 1
-pixel_conv = 0  # Amount of pixels converted
-pixel_conv_time = 0
-time_since_last_conv = time.time()
-eta_string = ""
-last_eta_print = time.time()
-last_eta = 0
-last_percent = -1
+    # Define default values to be used in converting algorithm
+    pixel_x = 0
+    pixel_y = 0
+    start_pixel_x = 0
+    start_pixel_y = 0
+    max_x = input_image.size[0] - 1
+    max_y = input_image.size[1] - 1
+    pixel_count = max_x * max_y
+    pixel_repeat = 1
+    pixel_conv = 0  # Amount of pixels converted
+    pixel_conv_time = 0
+    time_since_last_conv = time.time()
+    eta_string = ""
+    last_eta_print = time.time()
+    last_percent = -1
 
-print("\n Converting %s" % input_image)
-start_time = time.time()
+    #Time exec.
+    start_time = time.time()
+    print("\n Converting: %s" % input_image_name)
 
-# START OF CONVERTING
-while pixel_x <= max_x:
+    # START OF CONVERTING
+    while pixel_x <= max_x:
+        
+        # Calculate time used to convert 100 pixels
+        if (pixel_conv % 100 == 0):
+            pixel_conv_time = time.time() - time_since_last_conv
+            time_since_last_conv = time.time() 
     
-    # Calculate time used to convert 100 pixels
-    if (pixel_conv % 100 == 0):
-        pixel_conv_time = time.time() - time_since_last_conv
-        time_since_last_conv = time.time() 
-   
-    # Create and print progress bar and ETA
-    if (time.time() - last_eta_print >= 2):
-        eta = pixel_conv_time*((pixel_count - pixel_conv)/100)
-        eta_sec = eta % 60
-        eta_min = eta / 60
-        eta_string = " ETA: %dm %ds "  % (eta_min, eta_sec)
-        last_eta_print = time.time()
-    percent = round((pixel_x / max_x) * 100)
-    if (percent > last_percent):
-        last_percent = percent
-        percent_left = 100 - percent
-        progress_bar = ((round(percent / 2) * '█' ) 
-                       + (round(percent_left / 2) * '-'))
-        print(" Progress:", progress_bar, percent, "%", 
-            eta_string , end="\r")
+        # Create and print progress bar and ETA
+        if (time.time() - last_eta_print >= 2):
+            eta = pixel_conv_time*((pixel_count - pixel_conv)/100)
+            eta_sec = eta % 60
+            eta_min = eta / 60
+            eta_string = " ETA: %dm %ds "  % (eta_min, eta_sec)
+            last_eta_print = time.time()
+        percent = round((pixel_x / max_x) * 100)
+        if (percent > last_percent):
+            last_percent = percent
+            percent_left = 100 - percent
+            progress_bar = ((round(percent / 2) * '█' ) 
+                        + (round(percent_left / 2) * '-'))
+            print(" Progress:", progress_bar, percent, "%", 
+                eta_string , end="\r")
 
 
-    this_pixel = pixel[pixel_x, pixel_y]
-    start_pixel = pixel[start_pixel_x, start_pixel_y]
+        this_pixel = pixel_info[pixel_x, pixel_y]
+        start_pixel = pixel_info[start_pixel_x, start_pixel_y]
 
-    # If pixel is last in column
-    if (pixel_y == max_y):
-        next_pixel = this_pixel
-    else:
-        next_pixel = pixel[pixel_x, pixel_y + 1]
+        # If pixel is last in column
+        if (pixel_y == max_y):
+            next_pixel = this_pixel
+        else:
+            next_pixel = pixel_info[pixel_x, pixel_y + 1]
 
-    # Get color difference
-    rgb_diff = (abs(start_pixel[0] - next_pixel[0])
-                + abs(start_pixel[1] - next_pixel[1])
-                + abs(start_pixel[2] - next_pixel[2]))
+        # Get color difference
+        rgb_diff = (abs(start_pixel[0] - next_pixel[0])
+                    + abs(start_pixel[1] - next_pixel[1])
+                    + abs(start_pixel[2] - next_pixel[2]))
 
-    # Convert pixels
-    if (pixel_y < max_y):
-        if (rgb_diff > 6):
-            replace_pixels(start_pixel_x, start_pixel_y, pixel_repeat)
-            pixel_y += 1
+        # Convert pixels
+        if (pixel_y < max_y):
+            if (rgb_diff > 6):
+                convert_pixels(pixel_info, start_pixel_x, start_pixel_y, 
+                               pixel_repeat, texture_list, output_image)
+                pixel_y += 1
+                start_pixel_x, start_pixel_y = pixel_x, pixel_y
+                pixel_repeat = 1
+            else:
+                pixel_repeat += 1
+                pixel_y += 1
+        else:
+            if (rgb_diff > 6):
+                convert_pixels(pixel_info, start_pixel_x, start_pixel_y, 
+                               pixel_repeat, texture_list, output_image)
+            else:
+                pixel_repeat += 1
+                convert_pixels(pixel_info, start_pixel_x, start_pixel_y, 
+                               pixel_repeat, texture_list, output_image)
+            pixel_y = 0
+            pixel_x += 1
             start_pixel_x, start_pixel_y = pixel_x, pixel_y
             pixel_repeat = 1
-        else:
-            pixel_repeat += 1
-            pixel_y += 1
-    else:
-        if (rgb_diff > 6):
-            replace_pixels(start_pixel_x, start_pixel_y, pixel_repeat)
-        else:
-            pixel_repeat += 1
-            replace_pixels(start_pixel_x, start_pixel_y, pixel_repeat)
-        pixel_y = 0
-        pixel_x += 1
-        start_pixel_x, start_pixel_y = pixel_x, pixel_y
-        pixel_repeat = 1
-    pixel_conv += 1
-# END OF CONVERTING
+        pixel_conv += 1
+    # END OF CONVERTING
 
-# Caluclate and print time passed
-time_passed = (time.time() - start_time)
-sec_passed = time_passed % 60
-min_passed = time_passed / 60
-print("\n Finished in: %dm %ds" % (min_passed, sec_passed))
+    # Caluclate and print time passed
+    time_passed = (time.time() - start_time)
+    sec_passed = time_passed % 60
+    min_passed = time_passed / 60
+    print("\n Finished in: %dm %ds" % (min_passed, sec_passed))
 
+    convert_image.converted_image = output_image
 
-# Save converted image
-output_name = (input_image.split("."))[0] + "-mc.png"
-print(" Saving to %s" % output_name)
-final_image.save(output_name)
+def save_image(out_image, input_image_name):
+    # Save converted image
+    output_name = (input_image_name.split("."))[0] + "-mc.png"
+    print(" Saving to: %s" % output_name)
+    out_image.save(output_name)
+
+def main():
+    # Error check input and get values
+    check_input()
+    input_image = check_input.image
+    block_width = check_input.width
+    block_height = check_input.height
+    texture_list = file_to_list(check_input.texture_list)
+
+    # Resize input image to output image size
+    resize_image(input_image, block_width, block_height)
+    resized_image = resize_image.resized_image
+    output_image = resize_image.output_image
+
+    # Convert image to minecraft pixel art
+    convert_image(resized_image, output_image, texture_list, input_image)
+    converted_image = convert_image.converted_image
+
+    #Save converted image
+    save_image(converted_image, input_image)
+
+if __name__ == "__main__":
+    main()
