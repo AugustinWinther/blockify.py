@@ -49,23 +49,18 @@ def check_input():
         print("Width and height needs to be integers!")
         quit()
 
-    if ((width == 0) and (height == 0)):
-        print("Height and width can't both be 0!\n")
+    if (width == 0 and (height < 2 and height != 0)):
+        print("Block height invalid!\n"
+              "Please use a block height greater than 1")
         quit()
-    elif (width == 0):
-        if (height < 2):
-            print("Block height invalid!\n"
-                "Please use a block height greater than 1")
-            quit()
-    elif (height == 0):
-        if (width < 2):
-            print("Block width invalid!\n"
-                "Please use a block width greater than 1")
-            quit()
+    elif (height == 0 and (width < 2 and width != 0)):
+        print("Block width invalid!\n"
+              "Please use a block width greater than 1")
+        quit()
     elif ((width != 0) and (height != 0)):
         if ((width < 2) or (height < 2)):
             print("Block height or width invalid!\n"
-                "Please use size greater than 1")
+                  "Please use sizes greater than 1")
             quit()
 
     # Check texture_list for errors
@@ -90,15 +85,24 @@ def file_to_list(list_file):
     return list
 
 def resize_image(input_image, width, height):
-    with Image.open(input_image) as image:
-        if (width == 0):
-            width = round(image.size[0] * (height / image.size[1]))
-        elif (height == 0):
-            height = round(image.size[1] * (width / image.size[0]))
+    # Keep image size if width and heigth == 0
+    if (width == 0 and height == 0):
+        with Image.open(input_image) as image:
+            # Don't know how to convert PIL.<TILETYPE>Plugin.<TILETYPE>File
+            # to PIL.Image.Image, so i just resize the image to the same
+            # size, thus keeping the image at the same size. :P
+            resized_image = image.resize((image.size[0], image.size[1]))
+    else:
+        with Image.open(input_image) as image:
+            if (width == 0 and height != 0):
+                width = round(image.size[0] * (height / image.size[1]))
+            elif (height == 0 and width != 0):
+                height = round(image.size[1] * (width / image.size[0]))
+            
+            resized_image = image.resize((width, height))
         
-        resized_image = image.resize((width, height))
-        resized_width = (resized_image.size[0])
-        resized_height = (resized_image.size[1])
+    resized_width = (resized_image.size[0])
+    resized_height = (resized_image.size[1])
 
     output_image = Image.new('RGB', ((resized_width*16), (resized_height*16)))
     
