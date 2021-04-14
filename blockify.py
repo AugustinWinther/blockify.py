@@ -1,9 +1,9 @@
-# STD lib imports
+# Standard lib imports
 from sys import argv as cli_args
 from os import path
 import time
 
-# 3D pary imports
+# Third party imports
 from PIL import Image
 
 def check_input():
@@ -63,7 +63,7 @@ def check_input():
                   "Please use sizes greater than 1")
             quit()
 
-    # Check texture_list for errors
+    # Check texture list for errors
     if (path.exists(texture_list) == False):
         print("Texture list '%s' does not exist!" % texture_list)
         quit()
@@ -85,7 +85,7 @@ def file_to_list(list_file):
     return list
 
 def resize_image(input_image, width, height):
-    # Keep image size if width and heigth == 0
+    # Keep image size if width and height == 0
     if (width == 0 and height == 0):
         with Image.open(input_image) as image:
             # Don't know how to convert PIL.<TILETYPE>Plugin.<TILETYPE>File
@@ -131,10 +131,10 @@ def convert_pixels(pixel_info, pixel_x, pixel_y, length, list, output_image):
             output_image.paste(texture,((pixel_x*16),((pixel_y+i)*16)))
  
 def convert_image(input_image, output_image, texture_list, input_image_name):
-    # Set "pixel" to be equal to the pixel information from image
+    # Set "pixel" to be equal to the pixel information from input image
     pixel_info = input_image.load()
 
-    # Define default values to be used in converting algorithm
+    # Define default values to be used in the converting algorithm
     pixel_x = 0
     pixel_y = 0
     start_pixel_x = 0
@@ -219,7 +219,7 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
         pixel_conv += 1
     # END OF CONVERTING
 
-    # Caluclate and print time passed
+    # Calculate and print execution time
     time_passed = (time.time() - start_time)
     sec_passed = time_passed % 60
     min_passed = time_passed / 60
@@ -234,7 +234,7 @@ def save_image(out_image, input_image_name):
     out_image.save(output_name)
 
 def main():
-    # Error check input and get values
+    # Check input for errors and get values
     check_input()
     input_image = check_input.image
     block_width = check_input.width
@@ -250,7 +250,7 @@ def main():
     convert_image(resized_image, output_image, texture_list, input_image)
     converted_image = convert_image.converted_image
 
-    #Save converted image
+    # Save converted image
     save_image(converted_image, input_image)
 
 if __name__ == "__main__":
