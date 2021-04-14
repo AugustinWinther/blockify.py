@@ -15,3 +15,7 @@ Picture to Minecraft pixel art generator written in python.
 (To keep the ratio of input image, specify either width or height, and let the other one be 0.)
 
 e.g. ```python blockify.py test.jpg 256 0 all.txt ```
+
+(If you want the block width and block height to be the same as the image dimensions, set BOTH width and height input as 0)
+
+e.g. ```python blockify.py test.jpg 0 0 all.txt ```
