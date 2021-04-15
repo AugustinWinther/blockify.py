@@ -137,7 +137,6 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
     max_y = input_image.size[1] - 1
     pixel_count = (max_x + 1) * (max_y + 1)
     pixel_repeat = 1
-    pixel_conv = 0  # Amount of pixels converted
     pixel_conv_time = 0
     time_since_last_conv = time.time()
     eta_string = ""
@@ -152,12 +151,13 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
     while pixel_x <= max_x:
         
         # Calculate time used to convert 100 pixels
+        pixel_conv = (pixel_x) * (max_y) + pixel_y
         if (pixel_conv % 100 == 0):
             pixel_conv_time = time.time() - time_since_last_conv
             time_since_last_conv = time.time() 
     
         # Create and print progress bar and ETA
-        if (time.time() - last_eta_print >= 2):
+        if (time.time() - last_eta_print >= 1):
             eta = pixel_conv_time*((pixel_count - pixel_conv)/100)
             eta_sec = eta % 60
             eta_min = eta / 60
@@ -210,7 +210,7 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
             pixel_x += 1
             start_pixel_x, start_pixel_y = pixel_x, pixel_y
             pixel_repeat = 1
-        pixel_conv += 1
+        
     # END OF CONVERTING
 
     # Calculate and print execution time
