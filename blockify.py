@@ -29,7 +29,7 @@ def check_input():
                     texture_list = cli_args[4]
 
     # Check input image for errors
-    if (path.exists(image) == True):
+    if (path.exists(image)):
         if ((image.endswith(".png") == False) and 
             (image.endswith(".jpg") == False) and 
             (image.endswith(".bmp") == False) and
@@ -64,7 +64,7 @@ def check_input():
             quit()
 
     # Check texture list for errors
-    if (path.exists(texture_list) == False):
+    if not (path.exists(texture_list)):
         print("Texture list '%s' does not exist!" % texture_list)
         quit()
 
@@ -85,34 +85,28 @@ def file_to_list(list_file):
     return list
 
 def resize_image(input_image, width, height):
-    # Keep image size if width and height == 0
-    if (width == 0 and height == 0):
-        with Image.open(input_image) as image:
-            # Don't know how to convert PIL.<TILETYPE>Plugin.<TILETYPE>File
-            # to PIL.Image.Image, so i just resize the image to the same
-            # size, thus keeping the image at the same size. :P
-            resized_image = image.resize((image.size[0], image.size[1]))
-    else:
-        with Image.open(input_image) as image:
-            if (width == 0 and height != 0):
-                width = round(image.size[0] * (height / image.size[1]))
-            elif (height == 0 and width != 0):
-                height = round(image.size[1] * (width / image.size[0]))
-            
-            resized_image = image.resize((width, height))
-        
-    resized_width = (resized_image.size[0])
-    resized_height = (resized_image.size[1])
+    with Image.open(input_image) as image:
+        if (width == 0 and height != 0):
+            width = round(image.size[0] * (height / image.size[1]))
+        elif (height == 0 and width != 0):
+            height = round(image.size[1] * (width / image.size[0]))
+        else:
+            # If height and width both = 0, keep image dimensions
+            width = image.size[0]
+            height = image.size[1]
 
-    output_image = Image.new('RGB', ((resized_width*16), (resized_height*16)))
+        resized_image = image.resize((width, height))
+
+    # Image to paste minecraft block textures on (texture res = 16x16)    
+    output_image = Image.new('RGB', ((width*16), (height*16)))
     
     resize_image.output_image = output_image
     resize_image.resized_image = resized_image
 
-def pixel_to_texture(pixel_info, pixel_x, pixel_y, list):
+def pixel_to_texture(pixel_data, pixel_x, pixel_y, list):
     min_rgb_diff = 1000
     texture = False
-    pixel_rgb = pixel_info[pixel_x, pixel_y]
+    pixel_rgb = pixel_data[pixel_x, pixel_y]
 
     for index in list: 
         color_rgb = index[1]
@@ -124,15 +118,15 @@ def pixel_to_texture(pixel_info, pixel_x, pixel_y, list):
             texture = index[0]
     return texture
 
-def convert_pixels(pixel_info, pixel_x, pixel_y, length, list, output_image):
-    texture_file = pixel_to_texture(pixel_info, pixel_x, pixel_y, list)
+def convert_pixels(pixel_data, pixel_x, pixel_y, length, list, output_image):
+    texture_file = pixel_to_texture(pixel_data, pixel_x, pixel_y, list)
     for i in range(length):
         with Image.open(texture_file) as texture:
             output_image.paste(texture,((pixel_x*16),((pixel_y+i)*16)))
  
 def convert_image(input_image, output_image, texture_list, input_image_name):
     # Set "pixel" to be equal to the pixel information from input image
-    pixel_info = input_image.load()
+    pixel_data = input_image.load()
 
     # Define default values to be used in the converting algorithm
     pixel_x = 0
@@ -141,7 +135,7 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
     start_pixel_y = 0
     max_x = input_image.size[0] - 1
     max_y = input_image.size[1] - 1
-    pixel_count = max_x * max_y
+    pixel_count = (max_x + 1) * (max_y + 1)
     pixel_repeat = 1
     pixel_conv = 0  # Amount of pixels converted
     pixel_conv_time = 0
@@ -179,14 +173,14 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
                 eta_string , end="\r")
 
 
-        this_pixel = pixel_info[pixel_x, pixel_y]
-        start_pixel = pixel_info[start_pixel_x, start_pixel_y]
+        this_pixel = pixel_data[pixel_x, pixel_y]
+        start_pixel = pixel_data[start_pixel_x, start_pixel_y]
 
         # If pixel is last in column
         if (pixel_y == max_y):
             next_pixel = this_pixel
         else:
-            next_pixel = pixel_info[pixel_x, pixel_y + 1]
+            next_pixel = pixel_data[pixel_x, pixel_y + 1]
 
         # Get color difference
         rgb_diff = (abs(start_pixel[0] - next_pixel[0])
@@ -196,7 +190,7 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
         # Convert pixels
         if (pixel_y < max_y):
             if (rgb_diff > 6):
-                convert_pixels(pixel_info, start_pixel_x, start_pixel_y, 
+                convert_pixels(pixel_data, start_pixel_x, start_pixel_y, 
                                pixel_repeat, texture_list, output_image)
                 pixel_y += 1
                 start_pixel_x, start_pixel_y = pixel_x, pixel_y
@@ -206,11 +200,11 @@ def convert_image(input_image, output_image, texture_list, input_image_name):
                 pixel_y += 1
         else:
             if (rgb_diff > 6):
-                convert_pixels(pixel_info, start_pixel_x, start_pixel_y, 
+                convert_pixels(pixel_data, start_pixel_x, start_pixel_y, 
                                pixel_repeat, texture_list, output_image)
             else:
                 pixel_repeat += 1
-                convert_pixels(pixel_info, start_pixel_x, start_pixel_y, 
+                convert_pixels(pixel_data, start_pixel_x, start_pixel_y, 
                                pixel_repeat, texture_list, output_image)
             pixel_y = 0
             pixel_x += 1
